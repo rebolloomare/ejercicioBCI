@@ -3,15 +3,22 @@ package gl.bci.ejercicio.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class UserModel {
+@Entity
+public class User {
 
-    private String uuid;
+    @Id
+    @GeneratedValue
+    private String id;
 
     private String name;
 
@@ -21,6 +28,10 @@ public class UserModel {
     @Pattern(regexp = "^[A-Za-z0-9]*$", message = "Password incorrecto")
     private String password;
 
-    private List<PhoneModel> phones;
+    @OneToMany
+    private List<Phone> phones;
 
+    public User() {
+
+    }
 }

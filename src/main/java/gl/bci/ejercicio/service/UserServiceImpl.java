@@ -1,6 +1,6 @@
 package gl.bci.ejercicio.service;
 
-import gl.bci.ejercicio.model.UserModel;
+import gl.bci.ejercicio.model.User;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -10,7 +10,7 @@ public class UserServiceImpl implements UserService{
      * @return
      */
     @Override
-    public UserModel signUp(UserModel user) {
+    public User signUp(User user) {
 
         return user;
     }

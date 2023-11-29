@@ -1,8 +1,8 @@
 package gl.bci.ejercicio.service;
 
-import gl.bci.ejercicio.model.UserModel;
+import gl.bci.ejercicio.model.User;
 
 public interface UserService {
 
-    UserModel signUp(UserModel user);
+    User signUp(User user);
 }

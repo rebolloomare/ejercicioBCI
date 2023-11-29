@@ -1,6 +1,6 @@
 package gl.bci.ejercicio.controller;
 
-import gl.bci.ejercicio.model.UserModel;
+import gl.bci.ejercicio.model.User;
 import gl.bci.ejercicio.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +19,9 @@ public class UserController {
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<UserModel> signUp(@Valid @RequestBody UserModel user){
-        UserModel savedUser = userService.signUp(user);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedUser.getUuid()).toUri();
+    public ResponseEntity<User> signUp(@Valid @RequestBody User user){
+        User savedUser = userService.signUp(user);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedUser.getId()).toUri();
         return ResponseEntity.created(location).build();
     }
 }
