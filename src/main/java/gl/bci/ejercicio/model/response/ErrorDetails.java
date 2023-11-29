@@ -1,4 +1,4 @@
-package gl.bci.ejercicio.exception;
+package gl.bci.ejercicio.model.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

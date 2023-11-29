@@ -1,5 +1,6 @@
 package gl.bci.ejercicio.exception;
 
+import gl.bci.ejercicio.model.response.ErrorDetails;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package gl.bci.ejercicio.model;
+package gl.bci.ejercicio.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
