@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import java.time.LocalDate;
@@ -16,7 +15,6 @@ import java.util.List;
 public class User {
 
     @Id
-    @GeneratedValue
     private String id;
 
     private String name;

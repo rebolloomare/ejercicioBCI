@@ -13,7 +13,7 @@ public class LoginRequest {
     @Email(message = "Formato de correo incorrecto")
     private  String email;
 
-    @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d.*\\d)(?=.*[a-z]).{8,12}$", message = "Password incorrecto")
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d.*\\d)(?=.*[a-z]).{8,12}$", message = "Formato de password incorrecto")
     private String password;
 
 }

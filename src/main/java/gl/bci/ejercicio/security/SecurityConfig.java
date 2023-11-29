@@ -40,6 +40,7 @@ public class SecurityConfig {
         http.csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/users/sign-up").permitAll()
+                .antMatchers("/h2console/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()

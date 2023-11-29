@@ -23,7 +23,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
 
-@RestController("/users")
+@RestController
 public class UserController {
 
     private final UserService userService;
@@ -40,7 +40,7 @@ public class UserController {
         this.jwtTokensUtility = jwtTokensUtility;
     }
 
-    @PostMapping("/sign-up")
+    @PostMapping("/users/sign-up")
     public ResponseEntity<User> signUp(@Valid @RequestBody UserDto user){
         User savedUser = null;
         try {
@@ -52,7 +52,7 @@ public class UserController {
         return ResponseEntity.created(location).build();
     }
 
-    @PostMapping("/login")
+    @PostMapping("/users/login")
     public ResponseEntity<Object> login(@Valid @RequestBody LoginRequest loginRequest){
         try {
             Authentication authentication =

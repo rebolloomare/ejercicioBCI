@@ -17,4 +17,8 @@ El proyecto ha sido creado con las siguientes herramientas y versiones:
 * JUnit 5
 
 ## Instalación
-Para ejecutar este proyecto seguir los siguientes pasos:
+Para ejecutar este proyecto desde la linea de comandos seguir los siguientes pasos:
+Click en la opción "Run DemoEjercicioBciApplication"
+Ingresar por postman mediante POST:
+* Para crear usuarios: http://localhost:8080/bci/users/sign-up
+* Para consultar usuarios: http://localhost:8080/bci/users/login
