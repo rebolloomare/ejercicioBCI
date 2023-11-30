@@ -22,3 +22,7 @@ Click en la opción "Run DemoEjercicioBciApplication"
 Ingresar por postman mediante POST:
 * Para crear usuarios: http://localhost:8080/bci/users/sign-up
 * Para consultar usuarios: http://localhost:8080/bci/users/login
+* Conectarse a la consola de H2: http://localhost:8080/bci/h2-console
+  * user: sa
+  * password: sa
+  * Database: bcidb
