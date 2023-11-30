@@ -45,7 +45,7 @@ public class UserController {
             userResponse = userService.signUp(userDto);
         } catch (UserAlreadyExistException e) {
             ErrorDetails errorResponse = new ErrorDetails(LocalDate.now(),
-                    HttpStatus.CONFLICT.value(), "El Usuario ya existe " + userDto.getEmail());
+                    HttpStatus.CONFLICT.value(), "El Usuario ya existe: " + userDto.getEmail());
             return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
         }
 

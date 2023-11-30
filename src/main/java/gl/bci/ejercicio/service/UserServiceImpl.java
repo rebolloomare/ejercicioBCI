@@ -5,6 +5,7 @@ import gl.bci.ejercicio.exception.UserAlreadyExistException;
 import gl.bci.ejercicio.model.UserDto;
 import gl.bci.ejercicio.model.response.UserResponse;
 import gl.bci.ejercicio.repository.UserRepository;
+import gl.bci.ejercicio.util.JwtTokensUtility;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,9 +24,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    private final JwtTokensUtility jwtTokensUtility;
+
+    public UserServiceImpl(UserRepository userRepository,
+                           PasswordEncoder passwordEncoder,
+                           JwtTokensUtility jwtTokensUtility) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtTokensUtility = jwtTokensUtility;
     }
 
     /**
@@ -43,7 +49,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setEmail(userDto.getEmail());
         user.setPhones(null);
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setToken(userDto.getToken());
+        user.setToken(jwtTokensUtility.createToken(userDto));
         user.setCreated(LocalDateTime.now());
         user.setLastLogin(null);
         user.setActive(Boolean.TRUE);
