@@ -1,11 +1,11 @@
 package gl.bci.ejercicio.controller;
 
-import gl.bci.ejercicio.entities.User;
 import gl.bci.ejercicio.exception.UserAlreadyExistException;
 import gl.bci.ejercicio.model.UserDto;
 import gl.bci.ejercicio.model.request.LoginRequest;
 import gl.bci.ejercicio.model.response.ErrorDetails;
 import gl.bci.ejercicio.model.response.LoginResponse;
+import gl.bci.ejercicio.model.response.UserResponse;
 import gl.bci.ejercicio.service.UserService;
 import gl.bci.ejercicio.util.JwtTokensUtility;
 import org.springframework.http.HttpStatus;
@@ -17,10 +17,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.net.URI;
 import java.time.LocalDate;
 
 @RestController
@@ -41,15 +39,17 @@ public class UserController {
     }
 
     @PostMapping("/users/sign-up")
-    public ResponseEntity<User> signUp(@Valid @RequestBody UserDto user){
-        User savedUser = null;
+    public ResponseEntity<Object> signUp(@Valid @RequestBody UserDto userDto) {
+        UserResponse userResponse;
         try {
-            savedUser = userService.signUp(user);
+            userResponse = userService.signUp(userDto);
         } catch (UserAlreadyExistException e) {
-            return ResponseEntity.noContent().build();
+            ErrorDetails errorResponse = new ErrorDetails(LocalDate.now(),
+                    HttpStatus.CONFLICT.value(), "El Usuario ya existe " + userDto.getEmail());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
         }
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedUser.getId()).toUri();
-        return ResponseEntity.created(location).build();
+
+        return new ResponseEntity<>(userResponse, HttpStatus.CREATED);
     }
 
     @PostMapping("/users/login")

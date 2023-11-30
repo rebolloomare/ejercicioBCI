@@ -5,12 +5,14 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 public class UserDto {
+
+    private String id;
 
     private String name;
 
@@ -22,9 +24,9 @@ public class UserDto {
 
     private String token;
 
-    private LocalDate created;
+    private LocalDateTime created;
 
-    private LocalDate lastLogin;
+    private LocalDateTime lastLogin;
 
     private Boolean active;
 

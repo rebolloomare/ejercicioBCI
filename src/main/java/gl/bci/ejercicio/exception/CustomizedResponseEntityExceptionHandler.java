@@ -33,6 +33,15 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(UserAlreadyExistException.class)
+    public ResponseEntity<ErrorDetails> handleUserAlreadyExistException(Exception ex,
+                                                                  WebRequest request) throws Exception {
+        ErrorDetails errorDetails = new ErrorDetails(LocalDate.now(),
+                HttpStatus.CONFLICT.value(),
+                request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
                                                                   HttpHeaders headers,

@@ -3,6 +3,7 @@ package gl.bci.ejercicio.service;
 import gl.bci.ejercicio.entities.User;
 import gl.bci.ejercicio.exception.UserAlreadyExistException;
 import gl.bci.ejercicio.model.UserDto;
+import gl.bci.ejercicio.model.response.UserResponse;
 import gl.bci.ejercicio.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -10,7 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -32,7 +33,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * @return
      */
     @Override
-    public User signUp(UserDto userDto) throws UserAlreadyExistException {
+    public UserResponse signUp(UserDto userDto) throws UserAlreadyExistException {
         if(userRepository.findByEmail(userDto.getEmail()) != null){
             throw new UserAlreadyExistException("El Usuario ya existe: " + userDto.getEmail());
         }
@@ -43,10 +44,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setPhones(null);
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setToken(userDto.getToken());
-        user.setCreated(LocalDate.now());
+        user.setCreated(LocalDateTime.now());
         user.setLastLogin(null);
         user.setActive(Boolean.TRUE);
-        return userRepository.save(user);
+
+        User savedUser = userRepository.save(user);
+        UserResponse userResponse = new UserResponse();
+
+        userResponse.setId(savedUser.getId());
+        userResponse.setCreated(savedUser.getCreated());
+        userResponse.setLastLogin(savedUser.getLastLogin());
+        userResponse.setToken(savedUser.getToken());
+        userResponse.setActive(savedUser.getActive());
+
+        return userResponse;
     }
 
     @Override
