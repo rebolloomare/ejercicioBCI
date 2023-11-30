@@ -1,7 +1,9 @@
 package gl.bci.ejercicio.service;
 
+import gl.bci.ejercicio.entities.Phone;
 import gl.bci.ejercicio.entities.User;
 import gl.bci.ejercicio.exception.UserAlreadyExistException;
+import gl.bci.ejercicio.model.PhoneDto;
 import gl.bci.ejercicio.model.UserDto;
 import gl.bci.ejercicio.model.response.UserResponse;
 import gl.bci.ejercicio.repository.UserRepository;
@@ -47,7 +49,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setId(UUID.randomUUID().toString());
         user.setName(userDto.getName());
         user.setEmail(userDto.getEmail());
-        user.setPhones(null);
+
+        List<PhoneDto> phonesDtoList = userDto.getPhones();
+        List<Phone> phonesEntityList = new ArrayList<>();
+        Phone phone = null;
+        for(PhoneDto phoneDto : phonesDtoList){
+            phone = new Phone();
+            phone.setNumber(phoneDto.getNumber());
+            phone.setCityCode(phoneDto.getCityCode());
+            phone.setCountryCode(phoneDto.getCountryCode());
+            phonesEntityList.add(phone);
+        }
+        user.setPhones(phonesEntityList);
+
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setToken(jwtTokensUtility.createToken(userDto));
         user.setCreated(LocalDateTime.now());

@@ -3,10 +3,7 @@ package gl.bci.ejercicio.entities;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -39,7 +36,7 @@ public class User {
     @Column
     private Boolean active;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Phone> phones;
 
     public User() {
