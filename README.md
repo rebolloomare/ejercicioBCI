@@ -17,11 +17,13 @@ El proyecto ha sido creado con las siguientes herramientas y versiones:
 * JUnit 5
 
 ## Instalación
+* Clonar repositorio master: https://github.com/rebolloomare/ejercicioBCI.git
+
 Para ejecutar este proyecto desde la linea de comandos seguir los siguientes pasos:
 Click en la opción "Run DemoEjercicioBciApplication"
 Ingresar por postman mediante POST:
-* Para crear usuarios: http://localhost:8080/bci/users/sign-up
-* Para consultar usuarios: http://localhost:8080/bci/users/login
+* Endpoint para crear usuarios: http://localhost:8080/bci/users/sign-up
+* Endpoint para consultar usuarios: http://localhost:8080/bci/users/login
 * Conectarse a la consola de H2: http://localhost:8080/bci/h2-console
   * user: sa
   * password: sa
