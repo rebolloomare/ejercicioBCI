@@ -38,6 +38,7 @@ public class UserServiceImpl implements UserService {
         user.setId(UUID.randomUUID().toString());
         user.setName(userRequest.getName());
         user.setEmail(userRequest.getEmail());
+        user.setPassword(userRequest.getPassword());
 
         List<PhoneRequest> phonesDtoList = userRequest.getPhones();
         List<Phone> phonesEntityList = new ArrayList<>();
@@ -51,7 +52,6 @@ public class UserServiceImpl implements UserService {
         }
         user.setPhones(phonesEntityList);
 
-        user.setPassword(null);
         user.setToken(userRequest.getToken());
         user.setCreated(LocalDateTime.now());
         user.setActive(Boolean.TRUE);
@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setId(user.getId());
         loginResponse.setCreated(user.getCreated());
-        loginResponse.setLastLogin(user.getLastLogin());
+        loginResponse.setLastLogin(LocalDateTime.now());
         loginResponse.setToken(user.getToken());
         loginResponse.setActive(user.getActive());
         loginResponse.setName(user.getName());

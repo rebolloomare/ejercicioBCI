@@ -50,9 +50,8 @@ public class AuthController {
                                     loginRequest.getPassword()));
 
             String email = authentication.getName();
-            String passwordEncrypted = bCryptPasswordEncoder.encode(loginRequest.getPassword());
-            UserRequest user = new UserRequest(email, passwordEncrypted);
-            loginRequest.setPassword(passwordEncrypted);
+            UserRequest user = new UserRequest(email, "");
+            String token = jwtUtil.createToken(user);
 
             LoginResponse loginResponse = userService.login(loginRequest);
             if(loginResponse == null){
@@ -61,11 +60,6 @@ public class AuthController {
                         "Error al consultar al usuario");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
             }
-
-            String token = jwtUtil.createToken(user);
-            loginRequest.setPassword("");
-            loginRequest.setToken(token);
-
             return ResponseEntity.ok(loginResponse);
         } catch (BadCredentialsException e){
             ErrorDetails errorResponse = new ErrorDetails(LocalDateTime.now(),
