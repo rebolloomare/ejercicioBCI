@@ -1,4 +1,4 @@
-package gl.bci.ejercicio.model;
+package gl.bci.ejercicio.model.request;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +10,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class UserDto {
+public class UserRequest {
 
     private String id;
 
@@ -24,15 +24,17 @@ public class UserDto {
 
     private String token;
 
+    private String role;
+
     private LocalDateTime created;
 
     private LocalDateTime lastLogin;
 
     private Boolean active;
 
-    private List<PhoneDto> phones;
+    private List<PhoneRequest> phones;
 
-    public UserDto(String email, String password){
+    public UserRequest(String email, String password){
         this.email = email;
         this.password = password;
     }

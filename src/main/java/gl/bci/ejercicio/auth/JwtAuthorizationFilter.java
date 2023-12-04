@@ -1,8 +1,8 @@
-package gl.bci.ejercicio.security;
+package gl.bci.ejercicio.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gl.bci.ejercicio.util.JwtTokensUtility;
 import io.jsonwebtoken.Claims;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,45 +21,48 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class JwtTokenAuthorizationFilter extends OncePerRequestFilter {
+@Slf4j
+public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
-    private final JwtTokensUtility jwtTokensUtility;
+    private final JwtUtil jwtUtil;
 
     private final ObjectMapper mapper;
 
-    public JwtTokenAuthorizationFilter(JwtTokensUtility jwtTokensUtility, ObjectMapper mapper) {
-        this.jwtTokensUtility = jwtTokensUtility;
+
+    public JwtAuthorizationFilter(JwtUtil jwtUtil, ObjectMapper mapper) {
+        this.jwtUtil = jwtUtil;
         this.mapper = mapper;
     }
+
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         Map<String, Object> errorDetails = new HashMap<>();
-
-        try {
-            String accessToken = jwtTokensUtility.resolveToken(request);
-            if (accessToken == null ) {
+        try{
+            String accessToken = jwtUtil.resolveToken(request);
+            if(accessToken == null){
                 filterChain.doFilter(request, response);
                 return;
             }
-            Claims claims = jwtTokensUtility.resolveClaims(request);
-
-            if(claims != null & jwtTokensUtility.validateClaims(claims)){
+            log.info("Token: ", accessToken);
+            Claims claims = jwtUtil.resolveClaims(request);
+            if(claims != null & jwtUtil.validateClaims(claims)){
                 String email = claims.getSubject();
-                Authentication authentication =
-                        new UsernamePasswordAuthenticationToken(email,"",new ArrayList<>());
+                log.info("Email: ", email);
+                Authentication authentication = new UsernamePasswordAuthenticationToken(email,
+                        "",
+                        new ArrayList<>());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-
         } catch (Exception e) {
-            errorDetails.put("message", "Authentication Error");
-            errorDetails.put("details",e.getMessage());
+            errorDetails.put("message", "Error de Autenticacion");
+            errorDetails.put("details", e.getMessage());
             response.setStatus(HttpStatus.FORBIDDEN.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             mapper.writeValue(response.getWriter(), errorDetails);
         }
         filterChain.doFilter(request, response);
     }
-
 }

@@ -16,4 +16,6 @@ public class LoginRequest {
     @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d.*\\d)(?=.*[a-z]).{8,12}$", message = "Formato de password incorrecto")
     private String password;
 
+    private String token;
+
 }

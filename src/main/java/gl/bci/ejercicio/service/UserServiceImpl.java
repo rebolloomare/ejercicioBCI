@@ -3,15 +3,12 @@ package gl.bci.ejercicio.service;
 import gl.bci.ejercicio.entities.Phone;
 import gl.bci.ejercicio.entities.User;
 import gl.bci.ejercicio.exception.UserAlreadyExistException;
-import gl.bci.ejercicio.model.PhoneDto;
-import gl.bci.ejercicio.model.UserDto;
+import gl.bci.ejercicio.model.request.LoginRequest;
+import gl.bci.ejercicio.model.request.PhoneRequest;
+import gl.bci.ejercicio.model.request.UserRequest;
+import gl.bci.ejercicio.model.response.LoginResponse;
 import gl.bci.ejercicio.model.response.UserResponse;
 import gl.bci.ejercicio.repository.UserRepository;
-import gl.bci.ejercicio.util.JwtTokensUtility;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,52 +17,43 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    private final PasswordEncoder passwordEncoder;
-
-    private final JwtTokensUtility jwtTokensUtility;
-
-    public UserServiceImpl(UserRepository userRepository,
-                           PasswordEncoder passwordEncoder,
-                           JwtTokensUtility jwtTokensUtility) {
+    public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtTokensUtility = jwtTokensUtility;
     }
 
     /**
-     * @param userDto
+     * @param userRequest
      * @return
      */
     @Override
-    public UserResponse signUp(UserDto userDto) throws UserAlreadyExistException {
-        if(userRepository.findByEmail(userDto.getEmail()) != null){
-            throw new UserAlreadyExistException("El Usuario ya existe: " + userDto.getEmail());
+    public UserResponse signUp(UserRequest userRequest) throws UserAlreadyExistException {
+        if(userRepository.findByEmail(userRequest.getEmail()) != null){
+            throw new UserAlreadyExistException("El Usuario ya existe: " + userRequest.getEmail());
         }
         User user = new User();
         user.setId(UUID.randomUUID().toString());
-        user.setName(userDto.getName());
-        user.setEmail(userDto.getEmail());
+        user.setName(userRequest.getName());
+        user.setEmail(userRequest.getEmail());
 
-        List<PhoneDto> phonesDtoList = userDto.getPhones();
+        List<PhoneRequest> phonesDtoList = userRequest.getPhones();
         List<Phone> phonesEntityList = new ArrayList<>();
         Phone phone = null;
-        for(PhoneDto phoneDto : phonesDtoList){
+        for(PhoneRequest phoneRequest : phonesDtoList){
             phone = new Phone();
-            phone.setNumber(phoneDto.getNumber());
-            phone.setCityCode(phoneDto.getCityCode());
-            phone.setCountryCode(phoneDto.getCountryCode());
+            phone.setNumber(phoneRequest.getNumber());
+            phone.setCityCode(phoneRequest.getCityCode());
+            phone.setCountryCode(phoneRequest.getCountryCode());
             phonesEntityList.add(phone);
         }
         user.setPhones(phonesEntityList);
 
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setToken(jwtTokensUtility.createToken(userDto));
+        user.setPassword(null);
+        user.setToken(userRequest.getToken());
         user.setCreated(LocalDateTime.now());
-        user.setLastLogin(null);
         user.setActive(Boolean.TRUE);
 
         User savedUser = userRepository.save(user);
@@ -80,15 +68,26 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userResponse;
     }
 
+    /**
+     * @param loginRequest
+     * @return
+     */
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email);
-        List<String> roles = new ArrayList<>();
-        roles.add("USER");
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getEmail())
-                .password(user.getPassword())
-                .roles(roles.toArray(new String[0]))
-                .build();
+    public LoginResponse login(LoginRequest loginRequest) {
+        User user = userRepository.findByEmail(loginRequest.getEmail());
+
+        LoginResponse loginResponse = new LoginResponse();
+        loginResponse.setId(user.getId());
+        loginResponse.setCreated(user.getCreated());
+        loginResponse.setLastLogin(user.getLastLogin());
+        loginResponse.setToken(user.getToken());
+        loginResponse.setActive(user.getActive());
+        loginResponse.setName(user.getName());
+        loginResponse.setEmail(user.getEmail());
+        loginResponse.setPassword(user.getPassword());
+        loginResponse.setPhones(user.getPhones());
+
+        return loginResponse;
     }
+
 }

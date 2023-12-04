@@ -1,6 +1,6 @@
-package gl.bci.ejercicio.util;
+package gl.bci.ejercicio.auth;
 
-import gl.bci.ejercicio.model.UserDto;
+import gl.bci.ejercicio.model.request.UserRequest;
 import io.jsonwebtoken.*;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
@@ -11,27 +11,28 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class JwtTokensUtility {
+public class JwtUtil {
 
     private final String secret_key = "mysecretkey";
 
-    private final String TOKEN_HEADER = "Authorization";
-
-    private final String TOKEN_PREFIX = "Bearer ";
     private long accessTokenValidity = 60*60*1000;
 
     private final JwtParser jwtParser;
 
-    public JwtTokensUtility(){
+    private final String TOKEN_HEADER = "Authorization";
+
+    private final String TOKEN_PREFIX = "Bearer ";
+
+    public JwtUtil(){
         this.jwtParser = Jwts.parser().setSigningKey(secret_key);
     }
 
-    public String createToken(UserDto user) {
+    public String createToken(UserRequest user) {
         Claims claims = Jwts.claims().setSubject(user.getEmail());
+        claims.put("name",user.getName());
         claims.put("email",user.getEmail());
         Date tokenCreateTime = new Date();
-        Date tokenValidity = new Date(tokenCreateTime.getTime() +
-                TimeUnit.MINUTES.toMillis(accessTokenValidity));
+        Date tokenValidity = new Date(tokenCreateTime.getTime() + TimeUnit.MINUTES.toMillis(accessTokenValidity));
         return Jwts.builder()
                 .setClaims(claims)
                 .setExpiration(tokenValidity)
@@ -43,18 +44,18 @@ public class JwtTokensUtility {
         return jwtParser.parseClaimsJws(token).getBody();
     }
 
-    public Claims resolveClaims(HttpServletRequest req) {
+    public Claims resolveClaims(HttpServletRequest request) {
         try {
-            String token = resolveToken(req);
+            String token = resolveToken(request);
             if (token != null) {
                 return parseJwtClaims(token);
             }
             return null;
         } catch (ExpiredJwtException ex) {
-            req.setAttribute("expired", ex.getMessage());
+            request.setAttribute("expired", ex.getMessage());
             throw ex;
         } catch (Exception ex) {
-            req.setAttribute("invalid", ex.getMessage());
+            request.setAttribute("invalid", ex.getMessage());
             throw ex;
         }
     }

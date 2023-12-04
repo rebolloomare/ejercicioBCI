@@ -1,4 +1,4 @@
-package gl.bci.ejercicio.model;
+package gl.bci.ejercicio.model.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class PhoneDto {
+public class PhoneRequest {
 
     private Long number;
 

@@ -2,12 +2,14 @@ package gl.bci.ejercicio.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 @Entity
 public class User {
@@ -39,7 +41,4 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL)
     private List<Phone> phones;
 
-    public User() {
-
-    }
 }
