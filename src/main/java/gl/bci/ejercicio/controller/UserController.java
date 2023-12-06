@@ -4,9 +4,7 @@ import gl.bci.ejercicio.auth.JwtUtil;
 import gl.bci.ejercicio.entities.User;
 import gl.bci.ejercicio.exception.UserAlreadyExistException;
 import gl.bci.ejercicio.model.dto.UserDto;
-import gl.bci.ejercicio.model.request.LoginRequest;
 import gl.bci.ejercicio.model.response.ErrorDetails;
-import gl.bci.ejercicio.model.response.LoginResponse;
 import gl.bci.ejercicio.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -83,26 +81,28 @@ public class UserController {
     }
 
     @PostMapping("/auth/login")
-    public ResponseEntity<Object> login(@Valid @RequestBody LoginRequest loginRequest){
+    public ResponseEntity<Object> login(@Valid @RequestBody UserDto userDto){
+        UserDto userResponse;
         try {
             Authentication authentication =
                     authenticationManager.authenticate(
-                            new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
-                                    loginRequest.getPassword()));
+                            new UsernamePasswordAuthenticationToken(userDto.getEmail(),
+                                    userDto.getPassword()));
 
-            UserDto user = new UserDto();
-            user.setEmail(authentication.getName());
-            user.setPassword("");
-            String token = jwtUtil.createToken(user);
+            String token = jwtUtil.createToken(userDto);
+            userDto.setToken(token);
 
-            LoginResponse loginResponse = userService.login(loginRequest);
-            if(loginResponse == null){
+            User user = userService.login(userDto);
+            modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
+            userResponse = modelMapper.map(user, UserDto.class);
+
+            if(userResponse == null){
                 ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(),
                         HttpStatus.BAD_REQUEST.value(),
                         "Error al consultar al usuario");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
             }
-            return ResponseEntity.ok(loginResponse);
+            return ResponseEntity.ok(userResponse);
         } catch (BadCredentialsException e){
             ErrorDetails errorResponse = new ErrorDetails(LocalDateTime.now(),
                     HttpStatus.BAD_REQUEST.value(),"Usuario y/o password incorrectos");

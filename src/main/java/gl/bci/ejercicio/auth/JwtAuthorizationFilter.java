@@ -2,7 +2,6 @@ package gl.bci.ejercicio.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,13 +20,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-@Slf4j
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
 
     private final ObjectMapper mapper;
-
 
     public JwtAuthorizationFilter(JwtUtil jwtUtil, ObjectMapper mapper) {
         this.jwtUtil = jwtUtil;
@@ -46,11 +43,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
                 return;
             }
-            log.info("Token: ", accessToken);
             Claims claims = jwtUtil.resolveClaims(request);
             if(claims != null & jwtUtil.validateClaims(claims)){
                 String email = claims.getSubject();
-                log.info("Email: ", email);
                 Authentication authentication = new UsernamePasswordAuthenticationToken(email,
                         "",
                         new ArrayList<>());

@@ -3,10 +3,8 @@ package gl.bci.ejercicio.service;
 import gl.bci.ejercicio.entities.Phone;
 import gl.bci.ejercicio.entities.User;
 import gl.bci.ejercicio.exception.UserAlreadyExistException;
-import gl.bci.ejercicio.model.dto.UserDto;
-import gl.bci.ejercicio.model.request.LoginRequest;
 import gl.bci.ejercicio.model.dto.PhoneDto;
-import gl.bci.ejercicio.model.response.LoginResponse;
+import gl.bci.ejercicio.model.dto.UserDto;
 import gl.bci.ejercicio.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +33,7 @@ public class UserServiceImpl implements UserService {
         }
         User user = new User();
         user.setId(UUID.randomUUID().toString());
+        user.setLastLogin(LocalDateTime.now());
         user.setName(userRequest.getName());
         user.setEmail(userRequest.getEmail());
         user.setPassword(userRequest.getPassword());
@@ -59,25 +58,12 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * @param loginRequest
+     * @param userDto
      * @return
      */
     @Override
-    public LoginResponse login(LoginRequest loginRequest) {
-        User user = userRepository.findByEmail(loginRequest.getEmail());
-
-        LoginResponse loginResponse = new LoginResponse();
-        loginResponse.setId(user.getId());
-        loginResponse.setCreated(user.getCreated());
-        loginResponse.setLastLogin(LocalDateTime.now());
-        loginResponse.setToken(user.getToken());
-        loginResponse.setActive(user.getActive());
-        loginResponse.setName(user.getName());
-        loginResponse.setEmail(user.getEmail());
-        loginResponse.setPassword(user.getPassword());
-        loginResponse.setPhones(user.getPhones());
-
-        return loginResponse;
+    public User login(UserDto userDto) {
+        return userRepository.findByEmail(userDto.getEmail());
     }
 
 }
