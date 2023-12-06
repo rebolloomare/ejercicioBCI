@@ -1,13 +1,21 @@
 package gl.bci.ejercicio.controller;
 
 import gl.bci.ejercicio.auth.JwtUtil;
+import gl.bci.ejercicio.entities.User;
 import gl.bci.ejercicio.exception.UserAlreadyExistException;
-import gl.bci.ejercicio.model.request.UserRequest;
+import gl.bci.ejercicio.model.dto.UserDto;
+import gl.bci.ejercicio.model.request.LoginRequest;
 import gl.bci.ejercicio.model.response.ErrorDetails;
-import gl.bci.ejercicio.model.response.UserResponse;
+import gl.bci.ejercicio.model.response.LoginResponse;
 import gl.bci.ejercicio.service.UserService;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,30 +27,43 @@ import java.time.LocalDateTime;
 @RestController
 public class UserController {
 
+    private final AuthenticationManager authenticationManager;
+
     private final UserService userService;
 
     private final JwtUtil jwtUtil;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserController(JwtUtil jwtUtil, UserService userService,
-                          BCryptPasswordEncoder bCryptPasswordEncoder) {
+    private final ModelMapper modelMapper;
+
+    public UserController(AuthenticationManager authenticationManager,
+                          JwtUtil jwtUtil,
+                          UserService userService,
+                          BCryptPasswordEncoder bCryptPasswordEncoder,
+                          ModelMapper modelMapper) {
+        this.authenticationManager = authenticationManager;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtUtil = jwtUtil;
         this.userService = userService;
+        this.modelMapper = modelMapper;
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<Object> signUp(@Valid @RequestBody UserRequest userRequest) {
-        UserResponse userResponse;
+    public ResponseEntity<Object> signUp(@RequestBody @Valid UserDto userDto) {
+        UserDto userResponse;
         try {
-            String passwordEncrypted = bCryptPasswordEncoder.encode(userRequest.getPassword());
-            String token = jwtUtil.createToken(userRequest);
-            userRequest.setToken(token);
-            userRequest.setPassword(passwordEncrypted);
-            userRequest.setRole("USER");
+            String passwordEncrypted = bCryptPasswordEncoder.encode(userDto.getPassword());
+            String token = jwtUtil.createToken(userDto);
+            userDto.setToken(token);
+            userDto.setPassword(passwordEncrypted);
+            userDto.setRole("USER");
 
-            userResponse = userService.signUp(userRequest);
+            User user = userService.signUp(userDto);
+
+            modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
+            userResponse = modelMapper.map(user, UserDto.class);
+
             if(userResponse == null){
                 ErrorDetails errorResponse = new ErrorDetails(LocalDateTime.now(),
                         HttpStatus.BAD_REQUEST.value(),
@@ -52,16 +73,45 @@ public class UserController {
             return new ResponseEntity<>(userResponse, HttpStatus.CREATED);
         } catch (UserAlreadyExistException e) {
             ErrorDetails errorResponse = new ErrorDetails(LocalDateTime.now(),
-                    HttpStatus.CONFLICT.value(), "El Usuario ya existe: " + userRequest.getEmail());
+                    HttpStatus.CONFLICT.value(), "El Usuario ya existe: " + userDto.getEmail());
             return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
-        } catch (Exception e){
+        } catch (Exception e) {
+        ErrorDetails errorResponse = new ErrorDetails(LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(), "Formato de correo incorrecto");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+    }
+
+    @PostMapping("/auth/login")
+    public ResponseEntity<Object> login(@Valid @RequestBody LoginRequest loginRequest){
+        try {
+            Authentication authentication =
+                    authenticationManager.authenticate(
+                            new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
+                                    loginRequest.getPassword()));
+
+            UserDto user = new UserDto();
+            user.setEmail(authentication.getName());
+            user.setPassword("");
+            String token = jwtUtil.createToken(user);
+
+            LoginResponse loginResponse = userService.login(loginRequest);
+            if(loginResponse == null){
+                ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(),
+                        HttpStatus.BAD_REQUEST.value(),
+                        "Error al consultar al usuario");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
+            }
+            return ResponseEntity.ok(loginResponse);
+        } catch (BadCredentialsException e){
             ErrorDetails errorResponse = new ErrorDetails(LocalDateTime.now(),
-                    HttpStatus.BAD_REQUEST.value(),
-                    e.getMessage());
+                    HttpStatus.BAD_REQUEST.value(),"Usuario y/o password incorrectos");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        } catch (Exception e) {
+            ErrorDetails errorResponse = new ErrorDetails(LocalDateTime.now(),
+                    HttpStatus.BAD_REQUEST.value(), e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
     }
-
-
 
 }

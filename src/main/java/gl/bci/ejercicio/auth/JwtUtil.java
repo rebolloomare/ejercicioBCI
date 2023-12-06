@@ -1,6 +1,6 @@
 package gl.bci.ejercicio.auth;
 
-import gl.bci.ejercicio.model.request.UserRequest;
+import gl.bci.ejercicio.model.dto.UserDto;
 import io.jsonwebtoken.*;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
@@ -27,7 +27,7 @@ public class JwtUtil {
         this.jwtParser = Jwts.parser().setSigningKey(secret_key);
     }
 
-    public String createToken(UserRequest user) {
+    public String createToken(UserDto user) {
         Claims claims = Jwts.claims().setSubject(user.getEmail());
         claims.put("name",user.getName());
         claims.put("email",user.getEmail());
