@@ -7,13 +7,12 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component
 public class JwtUtil {
 
-    private final String secret_key = "mysecretkey";
+    private final String SECRET_KEY = "mysecretkey";
 
     private long accessTokenValidity = 60*60*1000;
 
@@ -24,7 +23,7 @@ public class JwtUtil {
     private final String TOKEN_PREFIX = "Bearer ";
 
     public JwtUtil(){
-        this.jwtParser = Jwts.parser().setSigningKey(secret_key);
+        this.jwtParser = Jwts.parser().setSigningKey(SECRET_KEY);
     }
 
     public String createToken(UserDto user) {
@@ -35,8 +34,9 @@ public class JwtUtil {
         Date tokenValidity = new Date(tokenCreateTime.getTime() + TimeUnit.MINUTES.toMillis(accessTokenValidity));
         return Jwts.builder()
                 .setClaims(claims)
+                .setIssuedAt(tokenCreateTime)
                 .setExpiration(tokenValidity)
-                .signWith(SignatureAlgorithm.HS256, secret_key)
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
 
@@ -74,14 +74,6 @@ public class JwtUtil {
         } catch (Exception e) {
             throw e;
         }
-    }
-
-    public String getEmail(Claims claims) {
-        return claims.getSubject();
-    }
-
-    private List<String> getRoles(Claims claims) {
-        return (List<String>) claims.get("roles");
     }
 
 }

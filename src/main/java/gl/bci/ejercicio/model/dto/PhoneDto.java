@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PhoneDto {
 
-    private Long number;
+    private String number;
 
     @JsonProperty("citycode")
-    private Integer cityCode;
+    private String cityCode;
 
     @JsonProperty("countrycode")
     private String countryCode;

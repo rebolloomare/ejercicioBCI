@@ -1,64 +1,64 @@
 package gl.bci.ejercicio.service;
 
-import gl.bci.ejercicio.entities.Phone;
+import gl.bci.ejercicio.auth.JwtUtil;
 import gl.bci.ejercicio.entities.User;
 import gl.bci.ejercicio.exception.UserAlreadyExistException;
-import gl.bci.ejercicio.model.dto.PhoneDto;
 import gl.bci.ejercicio.model.dto.UserDto;
 import gl.bci.ejercicio.repository.UserRepository;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
 
+    private final JwtUtil jwtUtil;
+
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    private final ModelMapper modelMapper;
+
     private final UserRepository userRepository;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(JwtUtil jwtUtil, BCryptPasswordEncoder bCryptPasswordEncoder, ModelMapper modelMapper, UserRepository userRepository) {
+        this.jwtUtil = jwtUtil;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.modelMapper = modelMapper;
         this.userRepository = userRepository;
     }
 
     /**
-     * @param userRequest
+     * @param userDto
      * @return
      */
     @Override
-    public User signUp(UserDto userRequest) throws UserAlreadyExistException {
-        if(userRepository.findByEmail(userRequest.getEmail()) != null){
-            throw new UserAlreadyExistException("El Usuario ya existe: " + userRequest.getEmail());
-        }
-        User user = new User();
-        user.setId(UUID.randomUUID().toString());
-        user.setLastLogin(LocalDateTime.now());
-        user.setName(userRequest.getName());
-        user.setEmail(userRequest.getEmail());
-        user.setPassword(userRequest.getPassword());
+    public User signUp(UserDto userDto) throws UserAlreadyExistException {
+        User user;
 
-        List<PhoneDto> phonesDtoList = userRequest.getPhones();
-        List<Phone> phonesEntityList = new ArrayList<>();
-        Phone phone = null;
-        for(PhoneDto phoneDto : phonesDtoList){
-            phone = new Phone();
-            phone.setNumber(phoneDto.getNumber());
-            phone.setCityCode(phoneDto.getCityCode());
-            phone.setCountryCode(phoneDto.getCountryCode());
-            phonesEntityList.add(phone);
+        if(userRepository.findByEmail(userDto.getEmail()) != null){
+            throw new UserAlreadyExistException("El Usuario ya existe: " + userDto.getEmail());
         }
-        user.setPhones(phonesEntityList);
 
-        user.setToken(userRequest.getToken());
-        user.setCreated(LocalDateTime.now());
-        user.setActive(Boolean.TRUE);
+        String passwordEncrypted = bCryptPasswordEncoder.encode(userDto.getPassword());
+        userDto.setPassword(passwordEncrypted);
+        String token = jwtUtil.createToken(userDto);
+        userDto.setToken(token);
+        userDto.setRole("USER");
+        userDto.setId(UUID.randomUUID().toString());
+        userDto.setCreated(LocalDateTime.now());
+        userDto.setActive(Boolean.TRUE);
+
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
+        user = modelMapper.map(userDto, User.class);
 
         return userRepository.save(user);
     }
 
     /**
-     * @param userDto
      * @return
      */
     @Override

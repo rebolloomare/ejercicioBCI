@@ -18,10 +18,15 @@ public class Phone {
     @GeneratedValue
     private Long id;
 
-    private Long number;
+    private String number;
 
-    private Integer cityCode;
+    private String cityCode;
 
     private String countryCode;
 
+    public Phone(String number, String cityCode, String countryCode) {
+        this.number = number;
+        this.cityCode = cityCode;
+        this.countryCode = countryCode;
+    }
 }

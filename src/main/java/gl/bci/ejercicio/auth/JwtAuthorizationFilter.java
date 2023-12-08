@@ -31,7 +31,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         this.mapper = mapper;
     }
 
-
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 @RestController
 public class UserController {
@@ -51,33 +52,24 @@ public class UserController {
     public ResponseEntity<Object> signUp(@RequestBody @Valid UserDto userDto) {
         UserDto userResponse;
         try {
-            String passwordEncrypted = bCryptPasswordEncoder.encode(userDto.getPassword());
-            String token = jwtUtil.createToken(userDto);
-            userDto.setToken(token);
-            userDto.setPassword(passwordEncrypted);
-            userDto.setRole("USER");
-
             User user = userService.signUp(userDto);
-
-            modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
-            userResponse = modelMapper.map(user, UserDto.class);
-
-            if(userResponse == null){
+            if(user == null){
                 ErrorDetails errorResponse = new ErrorDetails(LocalDateTime.now(),
-                        HttpStatus.BAD_REQUEST.value(),
-                        "Error al crear al nuevo Usuario");
+                        HttpStatus.NO_CONTENT.value(),
+                        "Error al crear al nuevo Usuario: " + userDto.getEmail());
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(errorResponse);
             }
-
+            userResponse = modelMapper.map(user, UserDto.class);
             return new ResponseEntity<>(userResponse, HttpStatus.CREATED);
         } catch (UserAlreadyExistException e) {
             ErrorDetails errorResponse = new ErrorDetails(LocalDateTime.now(),
                     HttpStatus.CONFLICT.value(), "El Usuario ya existe: " + userDto.getEmail());
             return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
         } catch (Exception e) {
-        ErrorDetails errorResponse = new ErrorDetails(LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(), "Formato de correo incorrecto");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-    }
+            ErrorDetails errorResponse = new ErrorDetails(LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(), Arrays.toString(e.getStackTrace()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
     }
 
     @PostMapping("/auth/login")
@@ -93,6 +85,7 @@ public class UserController {
             userDto.setToken(token);
 
             User user = userService.login(userDto);
+            user.setLastLogin(LocalDateTime.now());
             modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
             userResponse = modelMapper.map(user, UserDto.class);
 
