@@ -9,4 +9,5 @@ public interface UserService {
     User signUp(UserDto userDto) throws UserAlreadyExistException;
 
     User login(UserDto userDto);
+
 }

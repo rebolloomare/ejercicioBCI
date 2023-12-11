@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @DataJpaTest
 class UserRepositoryTest {
@@ -38,10 +39,16 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("JUit Test case to get User by email")
+    @DisplayName("JUnit Test case to get User by email")
     void findByEmail() {
         User savedUser = userRepository.save(user);
         User getUser = userRepository.findByEmail(user.getEmail());
         assertEquals(getUser.getEmail(), savedUser.getEmail());
+    }
+
+    @Test
+    @DisplayName("JUnit Test case to test null as parameter")
+    void findByEmailNull() {
+        assertNull(userRepository.findByEmail(null));
     }
 }

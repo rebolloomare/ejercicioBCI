@@ -10,11 +10,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,23 +22,15 @@ import java.util.Arrays;
 @RestController
 public class UserController {
 
-    private final AuthenticationManager authenticationManager;
-
     private final UserService userService;
 
     private final JwtUtil jwtUtil;
 
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
     private final ModelMapper modelMapper;
 
-    public UserController(AuthenticationManager authenticationManager,
-                          JwtUtil jwtUtil,
+    public UserController(JwtUtil jwtUtil,
                           UserService userService,
-                          BCryptPasswordEncoder bCryptPasswordEncoder,
                           ModelMapper modelMapper) {
-        this.authenticationManager = authenticationManager;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtUtil = jwtUtil;
         this.userService = userService;
         this.modelMapper = modelMapper;
@@ -76,11 +64,6 @@ public class UserController {
     public ResponseEntity<Object> login(@Valid @RequestBody UserDto userDto){
         UserDto userResponse;
         try {
-            Authentication authentication =
-                    authenticationManager.authenticate(
-                            new UsernamePasswordAuthenticationToken(userDto.getEmail(),
-                                    userDto.getPassword()));
-
             String token = jwtUtil.createToken(userDto);
             userDto.setToken(token);
 
