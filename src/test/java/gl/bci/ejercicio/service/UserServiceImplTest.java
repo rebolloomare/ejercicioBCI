@@ -9,7 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -22,7 +23,7 @@ class UserServiceImplTest {
     UserRepository userRepository;
 
     @Test
-    void testLogin() {
+    void test_Login() {
         User user = new User();
         user.setEmail("omar.rebollo@gmail.com");
         user.setPassword("a2asfGfdfdf4");
@@ -36,7 +37,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testLogin_UserNotFound() {
+    void test_Login_User_Not_Found() {
         UserDto userDto = new UserDto();
         userDto.setEmail("xxxx@gmail.com");
         userDto.setPassword("a2asfGfdfdf4");

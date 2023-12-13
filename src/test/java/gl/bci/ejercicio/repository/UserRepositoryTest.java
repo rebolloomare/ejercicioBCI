@@ -40,7 +40,7 @@ class UserRepositoryTest {
 
     @Test
     @DisplayName("JUnit Test case to get User by email")
-    void findByEmail() {
+    void find_By_Email() {
         User savedUser = userRepository.save(user);
         User getUser = userRepository.findByEmail(user.getEmail());
         assertEquals(getUser.getEmail(), savedUser.getEmail());
@@ -48,7 +48,7 @@ class UserRepositoryTest {
 
     @Test
     @DisplayName("JUnit Test case to test null as parameter")
-    void findByEmailNull() {
+    void find_By_Email_Null() {
         assertNull(userRepository.findByEmail(null));
     }
 }

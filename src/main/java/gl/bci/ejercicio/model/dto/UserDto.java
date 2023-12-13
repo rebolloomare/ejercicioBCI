@@ -32,7 +32,6 @@ public class UserDto {
 
     @NotEmpty(message = "Email no puede ir vacio")
     @Email(message = "Formato de correo no valido")
-    //@Pattern(regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")
     private String email;
 
     @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d.*\\d)(?=.*[a-z]).{8,12}$", message = "Password incorrecto")

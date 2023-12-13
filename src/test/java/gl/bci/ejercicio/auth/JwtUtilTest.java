@@ -34,7 +34,7 @@ class JwtUtilTest {
     }
 
     @Test
-    void createToken() {
+    void create_Token() {
         String accessToken = jwtUtil.createToken(userDto);
         String subject = Jwts.parser().setSigningKey(SECRET_KEY)
                      .parseClaimsJws(accessToken)
@@ -44,7 +44,7 @@ class JwtUtilTest {
     }
 
     @Test
-    void accessTokenUsesIssueDate(){
+    void access_Token_Uses_Issue_Date(){
         String accessToken = jwtUtil.createToken(userDto);
         Date issueAt = Jwts.parser().setSigningKey(SECRET_KEY)
                 .parseClaimsJws(accessToken)
@@ -54,7 +54,7 @@ class JwtUtilTest {
     }
 
     @Test
-    void createTokenWithExpirationTime(){
+    void create_Token_With_Expiration_Time(){
         String accessToken = jwtUtil.createToken(userDto);
         Claims expirationTime = Jwts.parser().setSigningKey(SECRET_KEY)
                 .parseClaimsJws(accessToken)
@@ -63,7 +63,7 @@ class JwtUtilTest {
     }
 
     @Test
-    void accessTokenHas24HoursExpiration(){
+    void access_Token_Has_24_Hours_Expiration(){
         String accessToken = jwtUtil.createToken(userDto);
         Claims claims = Jwts.parser()
                 .setSigningKey(SECRET_KEY)
@@ -77,7 +77,7 @@ class JwtUtilTest {
     }
 
     @Test
-    void validateClaims(){
+    void validate_Claims(){
         String accessToken = jwtUtil.createToken(userDto);
         Claims claims = Jwts.parser().setSigningKey(SECRET_KEY)
                 .parseClaimsJws(accessToken)

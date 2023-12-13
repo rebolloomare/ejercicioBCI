@@ -19,7 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.UUID;
@@ -30,7 +29,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
 class UserControllerTest {
 
     @Autowired
@@ -59,7 +57,7 @@ class UserControllerTest {
     }
 
     @Test
-    void testSignUp() throws UserAlreadyExistException, JsonProcessingException, JSONException {
+    void test_SignUp_Created() throws UserAlreadyExistException, JsonProcessingException, JSONException {
         when(userService.signUp(any(UserDto.class))).thenReturn(user);
 
         objectMapper.registerModule(new JavaTimeModule());
@@ -77,7 +75,7 @@ class UserControllerTest {
     }
 
     @Test
-    void testSignUpEmptyEmailUser() throws UserAlreadyExistException, JSONException {
+    void test_SignUp_Empty_Email_User() throws UserAlreadyExistException, JSONException {
         String emptyUser = "{\"name\":\"ABC\"}";
 
         HttpHeaders headers = new HttpHeaders();
@@ -96,7 +94,7 @@ class UserControllerTest {
     }
 
     @Test
-    void testLogin403() throws Exception {
+    void test_Login_Forbidden() throws Exception {
         String expected = "{\"status\":403,\"error\":\"Forbidden\",\"path\":\"/bci/users/auth/login\"}";
 
         ResponseEntity<String> response = restTemplate
@@ -108,7 +106,7 @@ class UserControllerTest {
     }
 
     @Test
-    void testLogin() throws JSONException {
+    void test_Login_OK() throws JSONException {
         when(userService.login(any(UserDto.class))).thenReturn(user);
 
         String token = "Bearer " + user.getToken();
@@ -133,7 +131,7 @@ class UserControllerTest {
     }
 
     @Test
-    void testLoginBadRequest() throws JSONException {
+    void test_Login_BadRequest() throws JSONException {
         when(userService.login(any(UserDto.class))).thenReturn(user);
 
         String token = "Bearer " + user.getToken();
@@ -153,6 +151,28 @@ class UserControllerTest {
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 
+    }
+
+    @Test
+    void test_Login_Wrong_Password() throws JSONException {
+        when(userService.login(any(UserDto.class))).thenReturn(user);
+
+        String token = "Bearer " + user.getToken();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", token);
+
+        JSONObject userJsonObject = new JSONObject();
+        userJsonObject.put("email", user.getEmail());
+        userJsonObject.put("password", "erjfkldsdjfklj");
+
+        HttpEntity<String> request = new HttpEntity<>(userJsonObject.toString(), headers);
+
+        ResponseEntity<String> response = restTemplate
+                .postForEntity("/auth/login", request, String.class);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
 }
