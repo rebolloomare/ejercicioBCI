@@ -6,16 +6,8 @@ public class UserAlreadyExistException extends Throwable{
 
     private Throwable cause;
 
-    public UserAlreadyExistException() {
-        super();
-    }
-
     public UserAlreadyExistException(String message) {
         super(message);
-    }
-
-    public UserAlreadyExistException(Throwable cause) {
-        super(cause);
     }
 
     public UserAlreadyExistException(String message, Throwable cause) {

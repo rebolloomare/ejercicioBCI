@@ -9,6 +9,7 @@ import gl.bci.ejercicio.exception.UserAlreadyExistException;
 import gl.bci.ejercicio.model.dto.UserDto;
 import gl.bci.ejercicio.service.UserServiceImpl;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,7 +54,6 @@ class UserControllerTest {
                 .email("omar.rebollo@gmail.com")
                 .active(Boolean.TRUE)
                 .token("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJvbWFyLnJlYm9sbG9AeWFob28uY29tIiwibmFtZSI6Im9tYXIiLCJlbWFpbCI6Im9tYXIucmVib2xsb0B5YWhvby5jb20iLCJleHAiOjE5MTc3MDg3MzV9.YHNmQQZMV7Kf_-b8lpsOKJqhbmdl4n5a_wl5kEJqtCg")
-                .lastLogin(null)
                 .build();
         userNull = null;
     }
@@ -96,7 +96,7 @@ class UserControllerTest {
     }
 
     @Test
-    void testLogin4033() throws Exception {
+    void testLogin403() throws Exception {
         String expected = "{\"status\":403,\"error\":\"Forbidden\",\"path\":\"/bci/users/auth/login\"}";
 
         ResponseEntity<String> response = restTemplate
@@ -105,6 +105,54 @@ class UserControllerTest {
         assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatusCode().value());
 
         JSONAssert.assertEquals(expected, response.getBody(), false);
+    }
+
+    @Test
+    void testLogin() throws JSONException {
+        when(userService.login(any(UserDto.class))).thenReturn(user);
+
+        String token = "Bearer " + user.getToken();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", token);
+
+        JSONObject userJsonObject = new JSONObject();
+        userJsonObject.put("email", user.getEmail());
+        userJsonObject.put("password", user.getPassword());
+
+        HttpEntity<String> request = new HttpEntity<>(userJsonObject.toString(), headers);
+
+        ResponseEntity<String> response = restTemplate
+                .postForEntity("/auth/login", request, String.class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        verify(userService, times(1)).login(any(UserDto.class));
+
+    }
+
+    @Test
+    void testLoginBadRequest() throws JSONException {
+        when(userService.login(any(UserDto.class))).thenReturn(user);
+
+        String token = "Bearer " + user.getToken();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", token);
+
+        JSONObject userJsonObject = new JSONObject();
+        userJsonObject.put("email", user.getId());
+        userJsonObject.put("password", user.getPassword());
+
+        HttpEntity<String> request = new HttpEntity<>(userJsonObject.toString(), headers);
+
+        ResponseEntity<String> response = restTemplate
+                .postForEntity("/auth/login", request, String.class);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+
     }
 
 }

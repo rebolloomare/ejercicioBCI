@@ -75,4 +75,15 @@ class JwtUtilTest {
                 + TimeUnit.MINUTES.toMillis(accessTokenValidity));
         assertThat(expiration.getTime(), equalTo(expectedExpiration.getTime()));
     }
+
+    @Test
+    void validateClaims(){
+        String accessToken = jwtUtil.createToken(userDto);
+        Claims claims = Jwts.parser().setSigningKey(SECRET_KEY)
+                .parseClaimsJws(accessToken)
+                .getBody();
+        assertThat(jwtUtil.validateClaims(claims),
+                equalTo(claims.getExpiration().after(new Date())));
+    }
+
 }
