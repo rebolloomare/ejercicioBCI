@@ -4,6 +4,8 @@ import gl.bci.ejercicio.model.dto.UserDto;
 import io.jsonwebtoken.*;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
@@ -18,7 +20,7 @@ public class JwtUtil {
 
     private final JwtParser jwtParser;
 
-    private final String TOKEN_HEADER = "Authorization";
+    private static final String AUTHORIZATION_HEADER = "Authorization";
 
     private final String TOKEN_PREFIX = "Bearer ";
 
@@ -61,7 +63,7 @@ public class JwtUtil {
     }
 
     public String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader(TOKEN_HEADER);
+        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
         if (bearerToken != null && bearerToken.startsWith(TOKEN_PREFIX)) {
             return bearerToken.substring(TOKEN_PREFIX.length());
         }
@@ -74,6 +76,10 @@ public class JwtUtil {
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    public static String getBearerTokenHeader() {
+        return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getHeader(AUTHORIZATION_HEADER);
     }
 
 }

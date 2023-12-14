@@ -64,7 +64,8 @@ public class UserController {
     public ResponseEntity<Object> login(@Valid @RequestBody UserDto userDto){
         UserDto userResponse;
         try {
-            String token = jwtUtil.createToken(userDto);
+
+            String token = JwtUtil.getBearerTokenHeader();
             userDto.setToken(token);
 
             User user = userService.login(userDto);
