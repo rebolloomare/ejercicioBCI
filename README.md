@@ -14,8 +14,10 @@ El proyecto ha sido creado con las siguientes herramientas y versiones:
 * Spring Framework 5.3.20
 * SpringBoot 2.5.14
 * Gradle 7.4
-* Lombook 1.8.30
+* Lombok 1.8.30
 * JUnit 5
+* Mockito
+* Docker
 
 ## Instalación
 * Clonar repositorio master: https://github.com/rebolloomare/ejercicioBCI.git
