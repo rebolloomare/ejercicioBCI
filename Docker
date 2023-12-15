@@ -1,4 +1,4 @@
-FROM openjdk:8
+FROM openjdk:11
 WORKDIR /demo-ejercicio-bci
 CMD ["./gradlew", "clean", "bootJar"]
 COPY build/libs/*.jar demo-ejercicio-bci-0.0.1-SNAPSHOT.jar
