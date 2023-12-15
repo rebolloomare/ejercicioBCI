@@ -1,3 +1,4 @@
+LABEL authors="Omar Rebollo"
 FROM openjdk:11
 WORKDIR /demo-ejercicio-bci
 CMD ["./gradlew", "clean", "bootJar"]
