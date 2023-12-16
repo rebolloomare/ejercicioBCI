@@ -6,6 +6,7 @@ import gl.bci.ejercicio.exception.UserAlreadyExistException;
 import gl.bci.ejercicio.model.dto.UserDto;
 import gl.bci.ejercicio.model.response.ErrorDetails;
 import gl.bci.ejercicio.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.http.HttpStatus;
@@ -20,21 +21,12 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 
 @RestController
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
-    private final JwtUtil jwtUtil;
-
     private final ModelMapper modelMapper;
-
-    public UserController(JwtUtil jwtUtil,
-                          UserService userService,
-                          ModelMapper modelMapper) {
-        this.jwtUtil = jwtUtil;
-        this.userService = userService;
-        this.modelMapper = modelMapper;
-    }
 
     @PostMapping("/sign-up")
     public ResponseEntity<Object> signUp(@RequestBody @Valid UserDto userDto) {

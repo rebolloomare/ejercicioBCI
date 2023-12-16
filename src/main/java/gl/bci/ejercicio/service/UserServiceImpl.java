@@ -5,6 +5,7 @@ import gl.bci.ejercicio.entities.User;
 import gl.bci.ejercicio.exception.UserAlreadyExistException;
 import gl.bci.ejercicio.model.dto.UserDto;
 import gl.bci.ejercicio.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final JwtUtil jwtUtil;
@@ -23,13 +25,6 @@ public class UserServiceImpl implements UserService {
     private final ModelMapper modelMapper;
 
     private final UserRepository userRepository;
-
-    public UserServiceImpl(JwtUtil jwtUtil, BCryptPasswordEncoder bCryptPasswordEncoder, ModelMapper modelMapper, UserRepository userRepository) {
-        this.jwtUtil = jwtUtil;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.modelMapper = modelMapper;
-        this.userRepository = userRepository;
-    }
 
     /**
      * @param userDto
